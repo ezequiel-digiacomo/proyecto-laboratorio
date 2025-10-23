@@ -1,5 +1,5 @@
-from api import obtener_texto
+from menu import MenuPrincipal
 
 if __name__ == "__main__":
-    print("\nPrueba Texto:\n")
-    print(obtener_texto())
+    menu = MenuPrincipal()
+    menu.ejecutar_menu()
