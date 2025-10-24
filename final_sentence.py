@@ -24,7 +24,7 @@ def ejecutar_juego():
     fuente_gameover = pygame.font.Font(None, 70)
 
     # Listas para generar frases
-    sujetos = ["La naturaleza", "El programador", "Una mente curiosa", "El conocimiento", "La paciencia", "Boti-K Puro Vegetal", "El arte", "La ciencia"]
+    sujetos = ["La naturaleza", "El programador", "Una mente curiosa", "El conocimiento", "La paciencia", "El arte", "La ciencia"]
     verbos = ["crea", "inspira", "transforma", "enseña", "guía", "fortalece", "descubre", "encuentra"]
     complementos = ["el camino correcto", "una solución nueva", "la armonía interior", "el poder del cambio", "la belleza de lo natural", "la esencia de la vida", "la fuerza del equilibrio"]
 
