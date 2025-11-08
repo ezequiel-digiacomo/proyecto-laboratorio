@@ -1,68 +1,68 @@
 import pygame, sys
-from final_sentence import ejecutar_juego   #  importa el juego
+from config import *
+from juego import ejecutar_juego
 
-ANCHO = 900
-ALTO = 500
-FPS = 60
 
-class MenuPrincipal:
+class Menu():
     def __init__(self):
         pygame.init()
-        self.pantalla = pygame.display.set_mode((ANCHO, ALTO))
-        pygame.display.set_caption("Menu Principal - Proyecto Laboratorio 2")
+        self.opciones= ["Jugar", "Opciones", "Salir"]
         self.reloj = pygame.time.Clock()
+        self.pantalla = pygame.display.set_mode((ANCHO, ALTO))
+        self.area_opcion0 = None
+        self.area_opcion1 = None
+        self.area_opcion2 = None
+        pygame.display.set_caption("Menu Principal")
 
-        # --- Fuentes ---
-        self.fuente_titulo = pygame.font.SysFont("arial", 48, bold=True)
-        self.fuente_boton = pygame.font.SysFont("arial", 30)
+        
 
-        # --- Colores ---
-        self.color_fondo = (20, 20, 30)
-        self.color_titulo = (255, 255, 255)
-        self.color_boton = (120, 200, 255)
-        self.color_boton_hover = (180, 240, 255)
+    @staticmethod
+    def botones_area():
+        return Menu.dibujar_opcione
 
-    def centrar_titulo(self, texto, fuente, color, y):
-        superficie_titulo = fuente.render(texto, True, color)
-        ubicacion_titulo = superficie_titulo.get_rect(center=(ANCHO // 2, y))
-        self.pantalla.blit(superficie_titulo, ubicacion_titulo)
+    def dibujar_opciones(self):
+        for i, texto in enumerate(self.opciones):
+            superficie = font_title.render(texto, False, colores["Belge"])
+            parametro = superficie.get_rect(topright=(ANCHO - 100, 200 + i * 80)) #mejorar
+            self.pantalla.blit(superficie, parametro)
+            if i == 0:
+                self.area_opcion0 = parametro
+            elif i == 1:
+                self.area_opcion1 = parametro
+            elif i == 2:
+                self.area_opcion2 = parametro
 
-    def dibujar_boton(self, texto, y, posicion_mouse):
-        ubicacion_boton = pygame.Rect(0, 0, 220, 60)
-        ubicacion_boton.center = (ANCHO // 2, y)
+            print(parametro)
 
-        color = self.color_boton_hover if ubicacion_boton.collidepoint(posicion_mouse) else self.color_boton
-        pygame.draw.rect(self.pantalla, color, ubicacion_boton, border_radius=10)
 
-        superficie_texto = self.fuente_boton.render(texto, True, (0, 0, 0))
-        ubicacion_texto = superficie_texto.get_rect(center=ubicacion_boton.center)
-        self.pantalla.blit(superficie_texto, ubicacion_texto)
-        return ubicacion_boton
+            
 
-    def ejecutar_menu(self):
-        bandera = True
-        while bandera:
-            posicion_mouse = pygame.mouse.get_pos()
-            self.pantalla.fill(self.color_fondo)
-            self.centrar_titulo("Final Sentence", self.fuente_titulo, self.color_titulo, 100)
 
-            boton_jugar = self.dibujar_boton("Jugar", 220, posicion_mouse)
-            boton_config = self.dibujar_boton("Configuración", 300, posicion_mouse)
-            boton_salir = self.dibujar_boton("Salir", 380, posicion_mouse)
+    def dibujar_titulo(self, texto, x, y):
+        superficie = font_title.render(texto, True, colores["Warm"]) #Convierte el texto en 'superficie'
+        rectangulo_texto = superficie.get_rect() #Obtengo las dimensiones de donde voy a poner el texto en pantall
+        rectangulo_texto = (x,y) #Le digo donde poner el texto
+        self.pantalla.blit(superficie, rectangulo_texto) #Lo coloco
+
+
+    def ejecutar(self):
+        while True:
+
+            self.dibujar_titulo("Final Sentences", 450, 80)
+            self.dibujar_opciones()
 
             for evento in pygame.event.get():
                 if evento.type == pygame.QUIT:
-                    bandera = False
-                elif evento.type == pygame.MOUSEBUTTONDOWN:
-                    if boton_jugar.collidepoint(evento.pos):
-                        ejecutar_juego()  # abre el juego
-                    elif boton_config.collidepoint(evento.pos):
-                        print("Botón Configuración presionado")
-                    elif boton_salir.collidepoint(evento.pos):
-                        bandera = False
-
-            pygame.display.flip()
+                    pygame.quit()
+                    sys.exit()
+                if evento.type == pygame.MOUSEBUTTONDOWN:
+                    click_pos = evento.pos
+                    if self.area_opcion0.collidepoint(click_pos): 
+                        ejecutar_juego()
+                        print(click_pos)
+                    #print(f"¡Clic en las coordenadas: {click_pos}!")
+                
+            pygame.display.update()
             self.reloj.tick(FPS)
 
-        pygame.quit()
-        sys.exit()
+
