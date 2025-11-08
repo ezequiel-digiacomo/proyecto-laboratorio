@@ -16,5 +16,5 @@ ALTO = 720
 FPS = 60
 
 #Fuentes
-font_title = pygame.font.Font("./Sources/Fonts/SpecialElite-Regular.ttf", 40)
-font_text = pygame.font.Font("./Sources/Fonts/AndadaPro-VariableFont_wght.ttf", 12)
+font_title = pygame.font.Font("./Sources/SpecialElite-Regular.ttf", 40)
+font_text = pygame.font.Font("./Sources/AndadaPro-VariableFont_wght.ttf", 12)
