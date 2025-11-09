@@ -1,6 +1,7 @@
 import pygame, sys
 from config import *
 from juego import ejecutar_juego
+from modal_salir import ModalSalir
 
 
 class Menu():
@@ -12,6 +13,7 @@ class Menu():
         self.area_opcion0 = None
         self.area_opcion1 = None
         self.area_opcion2 = None
+        self.modal_salir = ModalSalir(self.pantalla)
         pygame.display.set_caption("Menu Principal")
 
     def dibujar_opciones(self):
@@ -38,7 +40,7 @@ class Menu():
 
     def ejecutar(self):
         while True:
-
+            self.pantalla.fill(colores["Negro"]) #Con esto limpio el modal
             self.dibujar_titulo("Final Sentences", 450, 80)
             self.dibujar_opciones()
 
@@ -46,11 +48,24 @@ class Menu():
                 if evento.type == pygame.QUIT:
                     pygame.quit()
                     sys.exit()
-                if evento.type == pygame.MOUSEBUTTONDOWN:
+                    
+                #Aca veririfico las acciones del Modal Salir
+                accion_modal = self.modal_salir.manejar_eventos(evento)
+                if accion_modal == 'salir':
+                    pygame.quit()
+                    sys.exit()
+                elif accion_modal == 'cancelar':
+                    continue
+
+                if not self.modal_salir.activo and evento.type == pygame.MOUSEBUTTONDOWN:
                     click_pos = evento.pos
-                    if self.area_opcion0.collidepoint(click_pos): 
+                    if self.area_opcion0.collidepoint(click_pos):
                         ejecutar_juego()
                         print(click_pos)
-                
+                    elif self.area_opcion2.collidepoint(click_pos):
+                        self.modal_salir.abrir()
+
+            self.modal_salir.dibujar()
+
             pygame.display.update()
             self.reloj.tick(FPS)
