@@ -28,7 +28,7 @@ En macOS / Linux:
 
 ## Repositorio
 
-Repositorio en GitHub: [ProyectoArduino](https://github.com/ezequiel-digiacomo/ProyectoArduino)
+Repositorio en GitHub: [ProyectoLaboratorio](https://github.com/ezequiel-digiacomo/proyecto-laboratorio)
 
 **Clonar el Repositorio:**
 ```bash

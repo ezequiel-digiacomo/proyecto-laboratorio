@@ -1,5 +1,5 @@
-from menu_principal import MenuPrincipal
+from src.ui.menu_principal import Menu
 
 if __name__ == "__main__":
-    menu = MenuPrincipal()
-    menu.ejecutar_menu()
+    menu = Menu()
+    menu.ejecutar()
