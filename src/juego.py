@@ -10,7 +10,7 @@ Tarea Pendiente juego.py:
 """
 
 from config import *
-from  src.utils.diccionario_textos import *
+from utils.diccionario_textos import *
 import pygame, sys
 
 class NewGame():
