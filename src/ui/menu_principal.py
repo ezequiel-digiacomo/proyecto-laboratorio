@@ -1,6 +1,6 @@
 import pygame, sys
 from config import *
-from src.juego import ejecutar_juego
+from src.juego import NewGame
 from src.ui.modal_salir import ModalSalir
 
 
@@ -60,7 +60,8 @@ class Menu():
                 if not self.modal_salir.activo and evento.type == pygame.MOUSEBUTTONDOWN:
                     click_pos = evento.pos
                     if self.area_opcion0.collidepoint(click_pos):
-                        ejecutar_juego()
+                        inicio = NewGame()
+                        inicio.ejecutar_juego()
                         print(click_pos)
                     elif self.area_opcion2.collidepoint(click_pos):
                         self.modal_salir.abrir()

@@ -9,8 +9,9 @@ Tarea Pendiente juego.py:
 
 """
 
+
 from config import *
-from utils.diccionario_textos import *
+from src.utils.diccionario_textos import *
 import pygame, sys
 
 class NewGame():
