@@ -62,7 +62,6 @@ class Menu():
                     if self.area_opcion0.collidepoint(click_pos):
                         inicio = NewGame()
                         inicio.ejecutar_juego()
-                        print(click_pos)
                     elif self.area_opcion2.collidepoint(click_pos):
                         self.modal_salir.abrir()
 
