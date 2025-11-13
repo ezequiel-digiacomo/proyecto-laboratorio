@@ -1,4 +1,5 @@
 import pygame
+from pathlib import Path
 
 pygame.init()
 
@@ -18,3 +19,8 @@ FPS = 60
 #Fuentes
 font_title = pygame.font.Font("./assets/fonts/SpecialElite-Regular.ttf", 40)
 font_text = pygame.font.Font("./assets/fonts/AndadaPro-VariableFont_wght.ttf", 12)
+
+#sonidos
+
+basedir = Path(__file__).resolve().parent
+sounds = basedir / "assets" / "sounds"

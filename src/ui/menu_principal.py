@@ -1,5 +1,6 @@
 import pygame, sys
 from config import *
+from config import sounds
 from src.juego import ejecutar_juego
 from src.ui.modal_salir import ModalSalir
 
@@ -7,6 +8,14 @@ from src.ui.modal_salir import ModalSalir
 class Menu():
     def __init__(self):
         pygame.init()
+        pygame.mixer.init()   # inicializa audio
+
+        #  musica de fondo 
+        pygame.mixer.music.load(sounds / "musica-menu.ogg")  # ruta desde config
+        pygame.mixer.music.set_volume(0.5)
+        pygame.mixer.music.play(-1)  # loop infinito
+        
+        
         self.opciones= ["Jugar", "Opciones", "Salir"]
         self.reloj = pygame.time.Clock()
         self.pantalla = pygame.display.set_mode((ANCHO, ALTO))
