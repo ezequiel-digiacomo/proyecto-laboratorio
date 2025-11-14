@@ -21,17 +21,31 @@ class NewGame():
         pygame.display.set_caption("Final Sentence")
         self.pantalla =  pygame.display.set_mode((ANCHO, ALTO))
         self.reloj = pygame.time.Clock()
-        self.frase = obtener_frases_api("https://api.breakingbadquotes.xyz/v1/quotes/20")
-        self.frase_activa = self.frase[0]
+
+        self.frase = lista_textos
+        self.frase_activa = 0
+
+        self.cargador = [False] * 6 # CAPACIDAD DEL CARGADOR DE LA RULETA
+        self.vivo = True 
+    
+        self.cuenta_regresiva = 240 # en segundos : 4 minutos
+        self.tiempo_inicio = pygame.time.get_ticks()
         self.ronda = 0
+
         self.errores = 0
+        self.errores_activos = [False] * 3 # 
+
         self.puntaje = 0
+
+        self.input = ""
+        self.indice = 0
     
     def dibujar_texto(self, texto: str, x: int, y: int):
         superficie = font_title.render(texto, True, colores["Belge"]) 
         rectangulo_texto = superficie.get_rect()
         rectangulo_texto = (x,y) 
         self.pantalla.blit(superficie, rectangulo_texto)
+
 
     def formatear_frase(self, frase_activa: str, ancho_maximo: int):
 
@@ -59,27 +73,52 @@ class NewGame():
 
         return frase
 
+    def cargar_disparar(self):
+            for i in range(len(self.cargador)):
+                if self.cargador[i] is False:
+                    self.cargador[i] = True
+                    break
+            bala_actual = random.choice(self.cargador)
+            self.errores_activos = [False] * 3
+            if bala_actual == True:
+                self.vivo = False
+
+
                 
     def ejecutar_juego(self):
+        
+        renglon = 0
+
+
         while True:
+
 
             self.dibujar_texto(f"Errores: {self.errores}", 100, 10)
             self.dibujar_texto(f"Puntaje: {self.puntaje}", 1000, 10)
+
 
             for evento in pygame.event.get():
                 if evento.type == pygame.QUIT:
                     pygame.quit()
                     sys.exit()
-     
-            lineas = self.formatear_frase(self.frase_activa, 500)
-            
-            y = 150
-            for linea in lineas:
-                ancho_linea = font_title.size(linea)[0]
-                x = (ANCHO - ancho_linea) // 2 
-    
-                self.dibujar_texto(linea, x, y)
-                y += 40
+                if evento.type == pygame.KEYDOWN:  
+                    print(self.frase[self.frase_activa])
+                    self.input += str(evento.unicode)
+                    self.indice += 1
+                    print(self.input)
+                    if self.input[0:self.indice] == self.frase[self.frase_activa][0:self.indice]:
+                        print("vas bien")
+                    else:
+                        self.input = ""
+                        self.indice = 0
+                        self.errores += 1
+                        if self.errores % 3 == 0 :
+                            self.cargar_disparar()
+                    if self.input == self.frase[self.frase_activa]:
+                        self.frase_activa += 1
+                        self.input = ""
+                        self.indice = 0
+
 
             pygame.display.update()
             self.reloj.tick(FPS)

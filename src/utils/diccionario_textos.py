@@ -1,5 +1,6 @@
 import requests
 import random
+import json
 
 # url = "https://poetrydb.org/author/Ernest Dowson"
 # url = "https://api.breakingbadquotes.xyz/v1/quotes/20"
@@ -22,7 +23,7 @@ def texto_generico():
     """
     
     return texto
-
+"""
 def obtener_frases_api(url: str):
     
     try:
@@ -39,4 +40,40 @@ def obtener_frases_api(url: str):
         return texto_generico()
     except ValueError:
         return texto_generico()
+"""  
+
+def breaking_bad():
+    url = "https://api.breakingbadquotes.xyz/v1/quotes/20"
+
+    respuesta = requests.get(url)
+    datos = respuesta.json()
+    palabras_generadas = []
     
+    for i in datos:
+        palabras_generadas.append(i["quote"])
+
+    return palabras_generadas
+
+def poemas():
+    url_autores = "https://poetrydb.org/author/"
+    url_poemas = "https://poetrydb.org/author/"
+    autores = requests.get(url_autores)
+    datos = autores.json()
+
+    return datos
+
+"""
+def leer_txt():
+"""
+
+lista_textos = ["hola " + str(x) for x in range(20)]
+
+print(breaking_bad())
+
+#print(lista_textos)
+
+'''
+def selector():
+    lista_apis = [breaking_bad,]
+    random.choice()
+'''
