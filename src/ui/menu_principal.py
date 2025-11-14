@@ -9,7 +9,11 @@ class Menu():
         pygame.init()
         self.opciones= ["Jugar", "Opciones", "Salir"]
         self.reloj = pygame.time.Clock()
-        self.pantalla = pygame.display.set_mode((ANCHO, ALTO))
+        self.pantalla = aplicar_modo_pantalla()
+
+        # Agregué el ícono pa desbordar facha
+        icono = pygame.image.load("assets/images/revolver_icon2.png")
+        pygame.display.set_icon(icono)
 
         # Agregado de fondo y "capa de titileo"
         self.fondo = pygame.image.load("assets/images/mainmenu_background.png").convert()
@@ -41,7 +45,7 @@ class Menu():
                 escala = 1.05  # Leve aumento 
 
             # Renderizar texto normal y luego escalarlo
-            superficie = font_title.render(texto, True, color)
+            superficie = font_subtitle_main.render(texto, True, color)
             if escala != 1.0:
                 ancho = int(superficie.get_width() * escala)
                 alto = int(superficie.get_height() * escala)
@@ -104,7 +108,10 @@ class Menu():
                     click_pos = evento.pos
                     if self.area_opcion0.collidepoint(click_pos):
                         ejecutar_juego()
-                        print(click_pos)
+                    elif self.area_opcion1.collidepoint(click_pos):  # ✅ nueva conexión
+                        from src.ui.menu_opciones import MenuOpciones
+                        menu_opciones = MenuOpciones()
+                        menu_opciones.ejecutar()
                     elif self.area_opcion2.collidepoint(click_pos):
                         self.modal_salir.abrir()
 
