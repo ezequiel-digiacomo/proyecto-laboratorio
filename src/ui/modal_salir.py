@@ -60,8 +60,15 @@ class ModalSalir:
 
         self.pantalla.blit(self.fondo_oscuro, (0, 0))
 
+        # Crear superficie del modal con transparencia
+        superficie_modal = pygame.Surface((self.ancho_modal, self.alto_modal))
+        superficie_modal.set_alpha(50)
+        superficie_modal.fill(colores["Negro"])
+        self.pantalla.blit(superficie_modal, (self.x, self.y))
+        
+        # Borde del modal
         rect_modal = (self.x, self.y, self.ancho_modal, self.alto_modal)
-        pygame.draw.rect(self.pantalla, colores["Negro"], rect_modal)
+        #pygame.draw.rect(self.pantalla, colores["Negro"], rect_modal)
         pygame.draw.rect(self.pantalla, colores["BurnedEdge"], rect_modal, 3)
 
         superficie_titulo = font_title.render("¿Seguro que desea Salir?", True, colores["Belge"])
