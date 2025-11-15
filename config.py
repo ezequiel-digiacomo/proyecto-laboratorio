@@ -7,7 +7,13 @@ colores = {
     "Negro": (0,0,0,0),
     "Maroon": (142,22,22),
     "Belge": (232, 201, 153),
-    "Warm": (248, 238, 223)
+    "Warm": (248, 238, 223),
+
+    # Colores nuevos facheros facheritos
+    "DarkWood": (59, 47, 47),
+    "Mahogany": (92, 47, 31),
+    "OldPaper": (201, 178, 138),
+    "BurnedEdge": (29, 21, 18)
 }
 
 #PANTALLA

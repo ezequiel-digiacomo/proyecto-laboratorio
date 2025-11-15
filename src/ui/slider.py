@@ -20,6 +20,11 @@ class Slider:
         self.knob_radius = 8
         self.arrastrando = False
 
+    def esta_sobre_knob(self):
+        mx, my = pygame.mouse.get_pos()
+        return self.knob_pos.collidepoint((mx, my))
+
+
     def draw(self, pantalla):
         # === DIBUJAR LA BARRA ===
         pygame.draw.rect(pantalla, self.color_base, self.rect)

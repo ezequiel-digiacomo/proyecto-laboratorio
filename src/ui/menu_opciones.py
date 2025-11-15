@@ -92,6 +92,7 @@ class MenuOpciones:
                 self.pantalla.blit(surf_estado, rect_estado)
 
     def ejecutar(self):
+        pygame.mouse.set_cursor(pygame.SYSTEM_CURSOR_ARROW) # Reiniciar el cursor
         while True:
 
             # === EVENTOS ===
@@ -128,6 +129,17 @@ class MenuOpciones:
 
             self.dibujar_titulo("Opciones", ANCHO//2, 80)
             self.dibujar_opciones()
+            
+            pos_mouse = pygame.mouse.get_pos()
+
+            hover_modo_pantalla = self.areas[1] and self.areas[1].collidepoint(pos_mouse)
+            hover_volver = self.areas[2] and self.areas[2].collidepoint(pos_mouse)
+            hover_knob = self.slider.esta_sobre_knob()
+
+            if hover_modo_pantalla or hover_volver or hover_knob:
+                pygame.mouse.set_cursor(pygame.SYSTEM_CURSOR_HAND)
+            else:
+                pygame.mouse.set_cursor(pygame.SYSTEM_CURSOR_ARROW)
 
             pygame.display.update()
             self.reloj.tick(FPS)

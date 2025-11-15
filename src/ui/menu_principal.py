@@ -77,6 +77,7 @@ class Menu():
 
 
     def ejecutar(self):
+        pygame.mouse.set_cursor(pygame.SYSTEM_CURSOR_ARROW) # Reiniciar el cursor
         while True:
             #self.pantalla.fill(colores["Negro"]) #Con esto limpio el modal
             self.pantalla.blit(self.fondo, (0, 0)) # Reemplacé el fondo negro por la imágen
@@ -90,6 +91,17 @@ class Menu():
 
             self.dibujar_titulo("Final Sentences", 450, 80)
             self.dibujar_opciones()
+
+            # Mouse de la manito pa los botones
+            pos_mouse = pygame.mouse.get_pos()
+
+            if (self.area_opcion0 and self.area_opcion0.collidepoint(pos_mouse)) or \
+            (self.area_opcion1 and self.area_opcion1.collidepoint(pos_mouse)) or \
+            (self.area_opcion2 and self.area_opcion2.collidepoint(pos_mouse)):
+
+                pygame.mouse.set_cursor(pygame.SYSTEM_CURSOR_HAND)
+            else:
+                pygame.mouse.set_cursor(pygame.SYSTEM_CURSOR_ARROW)
 
             for evento in pygame.event.get():
                 if evento.type == pygame.QUIT:
