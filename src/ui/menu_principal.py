@@ -2,6 +2,7 @@ import pygame, sys, math, random
 from config import *
 from src.juego import *
 from src.ui.modal_salir import ModalSalir
+from src.utils.frases_menu import FrasesMenu
 
 
 class Menu():
@@ -20,11 +21,13 @@ class Menu():
         self.fondo = pygame.transform.scale(self.fondo, (ANCHO, ALTO))
         self.overlay = pygame.Surface((ANCHO, ALTO))
         self.overlay.fill((0, 0, 0))
-        
+
         self.area_opcion0 = None
         self.area_opcion1 = None
         self.area_opcion2 = None
         self.modal_salir = ModalSalir(self.pantalla)
+        self.frases_menu = FrasesMenu()
+
         pygame.display.set_caption("Menu Principal")
 
     def dibujar_opciones(self):
@@ -70,10 +73,36 @@ class Menu():
             print(parametro)
 
     def dibujar_titulo(self, texto, x, y):
-        superficie = font_title.render(texto, True, colores["Warm"]) 
+        superficie = font_title.render(texto, True, colores["Warm"])
         rectangulo_texto = superficie.get_rect()
-        rectangulo_texto = (x,y) 
+        rectangulo_texto = (x,y)
         self.pantalla.blit(superficie, rectangulo_texto)
+
+    def dibujar_frase(self):
+        frase = self.frases_menu.obtener_frase_actual()
+
+        # Dividir frase en líneas
+        palabras = frase.split()
+        lineas = []
+        linea_actual = ""
+        ancho_maximo = 230
+
+        for palabra in palabras:
+            prueba = linea_actual + palabra + " "
+            if font_leyenda.size(prueba)[0] <= ancho_maximo:
+                linea_actual = prueba
+            else:
+                if linea_actual:
+                    lineas.append(linea_actual.strip())
+                linea_actual = palabra + " "
+        if linea_actual:
+            lineas.append(linea_actual.strip())
+
+        # Dibujar cada línea en la hoja con rotación
+        for i, linea in enumerate(lineas):
+            superficie_linea = font_leyenda.render(linea, True, (35, 25, 15))
+            superficie_rotada = pygame.transform.rotate(superficie_linea, +5)
+            self.pantalla.blit(superficie_rotada, (175 + i * 2, 200 + i * 20))
 
 
     def ejecutar(self):
@@ -89,8 +118,12 @@ class Menu():
             self.overlay.set_alpha(brillo)
             self.pantalla.blit(self.overlay, (0, 0))
 
+            # Actualizar frases
+            self.frases_menu.actualizar()
+
             self.dibujar_titulo("Final Sentences", 450, 80)
             self.dibujar_opciones()
+            self.dibujar_frase()
 
             # Mouse de la manito pa los botones
             pos_mouse = pygame.mouse.get_pos()
