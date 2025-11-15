@@ -22,7 +22,7 @@ class NewGame():
         self.pantalla =  pygame.display.set_mode((ANCHO, ALTO))
         self.reloj = pygame.time.Clock()
 
-        self.frase = lista_textos
+        self.frase = selector()
         self.frase_activa = 0
 
         self.cargador = [False] * 6 # CAPACIDAD DEL CARGADOR DE LA RULETA
@@ -30,6 +30,8 @@ class NewGame():
     
         self.cuenta_regresiva = 240 # en segundos : 4 minutos
         self.tiempo_inicio = pygame.time.get_ticks()
+        tiempo_restante_formateado = "04:00"
+
         self.ronda = 0
 
         self.errores = 0
@@ -81,43 +83,107 @@ class NewGame():
             bala_actual = random.choice(self.cargador)
             self.errores_activos = [False] * 3
             if bala_actual == True:
-                self.vivo = False
+                print(f"estado de bala {bala_actual}")
+            return not bala_actual
 
 
                 
     def ejecutar_juego(self):
-        
-        renglon = 0
 
+        running = True
+        while running:
 
-        while True:
+            self.pantalla.fill(colores["Negro"])
+            # --- AÑADIR ESTE BLOQUE PARA EL TIMER ---
+            # Calcular tiempo
+            tiempo_actual = pygame.time.get_ticks()
+            tiempo_transcurrido = (tiempo_actual - self.tiempo_inicio) // 1000
+            tiempo_restante = self.cuenta_regresiva - tiempo_transcurrido
 
+            # Comprobar si se acabó el tiempo
+            if tiempo_restante <= 0:
+                self.vivo = False # Marcamos el fin de la partida
+                break # Salimos del bucle 'while True', volviendo al menú
+
+            # Formatear el texto del timer
+            minutos = tiempo_restante // 60
+            segundos = tiempo_restante % 60
+            texto_timer = f"{minutos:02}:{segundos:02}"
+            
+            # Dibujar el timer (abajo a la izquierda)
+            self.dibujar_texto(texto_timer, 100, ALTO - 70)
+            # --- FIN DEL BLOQUE AÑADIDO ---
 
             self.dibujar_texto(f"Errores: {self.errores}", 100, 10)
             self.dibujar_texto(f"Puntaje: {self.puntaje}", 1000, 10)
 
+            # --- AÑADIDO ---
+            # 2. Lógica para obtener y dibujar las 3 frases
+            frase_actual_str = ""
+            frase_siguiente_1 = ""
+            frase_siguiente_2 = ""
+
+            try:
+                # Obtenemos la frase actual
+                frase_actual_str = self.frase[self.frase_activa]
+                
+                # Obtenemos las siguientes (si existen)
+                if self.frase_activa + 1 < len(self.frase):
+                    frase_siguiente_1 = self.frase[self.frase_activa + 1]
+                if self.frase_activa + 2 < len(self.frase):
+                    frase_siguiente_2 = self.frase[self.frase_activa + 2]
+            except IndexError:
+                pass # Pasa si la lista de frases está vacía o si ganamos
+
+            # --- DIBUJAR LÍNEA ACTUAL (con progreso) ---
+            Y_ACTUAL = 200 # Coordenada Y para la línea principal
+            X_INICIO = 150
+            
+            # 2a. Parte ya tipeada (en color "Warm")
+            texto_tipeado = self.input
+            superficie_tipeada = font_title.render(texto_tipeado, True, colores["Warm"])
+            rect_tipeado = superficie_tipeada.get_rect(topleft=(X_INICIO, Y_ACTUAL))
+            self.pantalla.blit(superficie_tipeada, rect_tipeado)
+            
+            # 2b. Parte restante (en color "Belge")
+            texto_restante = frase_actual_str[self.indice:]
+            superficie_restante = font_title.render(texto_restante, True, colores["Belge"])
+            x_restante = X_INICIO + rect_tipeado.width # La ponemos justo después de la parte tipeada
+            rect_restante = superficie_restante.get_rect(topleft=(x_restante, Y_ACTUAL))
+            self.pantalla.blit(superficie_restante, rect_restante)
+
+
+            # --- DIBUJAR LÍNEAS SIGUIENTES ---
+            # (Usamos tu función dibujar_texto, que usa la fuente grande y color Belge)
+            self.dibujar_texto(frase_siguiente_1, X_INICIO, Y_ACTUAL + 60) # 60 píxeles abajo
+            self.dibujar_texto(frase_siguiente_2, X_INICIO, Y_ACTUAL + 120) # 120 píxeles abajo
+            # --- FIN DEL BLOQUE AÑADIDO ---
 
             for evento in pygame.event.get():
                 if evento.type == pygame.QUIT:
                     pygame.quit()
                     sys.exit()
-                if evento.type == pygame.KEYDOWN:  
+                if evento.type == pygame.KEYDOWN: 
+
+                    if not evento.unicode:
+                        continue 
+
                     print(self.frase[self.frase_activa])
                     self.input += str(evento.unicode)
                     self.indice += 1
                     print(self.input)
                     if self.input[0:self.indice] == self.frase[self.frase_activa][0:self.indice]:
-                        print("vas bien")
+                        continue
                     else:
                         self.input = ""
                         self.indice = 0
                         self.errores += 1
                         if self.errores % 3 == 0 :
-                            self.cargar_disparar()
-                    if self.input == self.frase[self.frase_activa]:
-                        self.frase_activa += 1
-                        self.input = ""
-                        self.indice = 0
+                            running = self.cargar_disparar()
+                if self.input == self.frase[self.frase_activa]:
+                    self.frase_activa += 1
+                    self.input = ""
+                    self.indice = 0
 
 
             pygame.display.update()

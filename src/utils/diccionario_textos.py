@@ -1,6 +1,7 @@
 import requests
 import random
 import json
+import os
 
 # url = "https://poetrydb.org/author/Ernest Dowson"
 # url = "https://api.breakingbadquotes.xyz/v1/quotes/20"
@@ -55,12 +56,31 @@ def breaking_bad():
     return palabras_generadas
 
 def poemas():
-    url_autores = "https://poetrydb.org/author/"
+    url_autores = "https://poetrydb.org/author"
     url_poemas = "https://poetrydb.org/author/"
     autores = requests.get(url_autores)
     datos = autores.json()
+    autor = random.choice(datos["authors"])
+    url_poemas += autor
 
-    return datos
+    obtener_lineas = requests.get(url_poemas).json()
+
+    obtenida = obtener_lineas[0]["lines"]
+
+    return obtenida
+
+def textos_offline():
+    ruta_de_la_carpeta =  os.getcwd()
+    ruta_textos = ruta_de_la_carpeta + "/src/utils/offlinetexts"
+    archivos_y_carpetas = os.listdir(ruta_textos)
+    archivo_elegido = random.choice(archivos_y_carpetas)
+    
+    with open(f"{ruta_textos}/{archivo_elegido}" , "r", encoding="utf-8") as f:
+        lineas = f.readlines()
+        lista_limpia = [linea.replace('\n', '') for linea in lineas]
+
+    return lista_limpia
+
 
 """
 def leer_txt():
@@ -68,12 +88,17 @@ def leer_txt():
 
 lista_textos = ["hola " + str(x) for x in range(20)]
 
-print(breaking_bad())
-
+#print(poemas())
+#print(textos_offline())
 #print(lista_textos)
 
-'''
+
 def selector():
-    lista_apis = [breaking_bad,]
-    random.choice()
-'''
+    lista_apis = [breaking_bad, poemas, textos_offline]
+    selecta = random.choice(lista_apis)
+    try:
+        return selecta()
+    except:
+        return textos_offline()
+
+selector()
