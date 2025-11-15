@@ -9,96 +9,77 @@ Tarea Pendiente juego.py:
 
 """
 
-#Ignoren las advertencias porque a lo último estuve quitando código haciendo que posiblemente se rompa
 
 from config import *
-from src.utils.palabras import *
-import pygame
-import sys
-import time
+from src.utils.diccionario_textos import *
+import pygame, sys
 
+class NewGame():
 
+    def __init__(self):
+        pygame.init()
+        pygame.display.set_caption("Final Sentence")
+        self.pantalla =  pygame.display.set_mode((ANCHO, ALTO))
+        self.reloj = pygame.time.Clock()
+        self.frase = obtener_frases_api("https://api.breakingbadquotes.xyz/v1/quotes/20")
+        self.frase_activa = self.frase[0]
+        self.ronda = 0
+        self.errores = 0
+        self.puntaje = 0
+    
+    def dibujar_texto(self, texto: str, x: int, y: int):
+        superficie = font_title.render(texto, True, colores["Belge"]) 
+        rectangulo_texto = superficie.get_rect()
+        rectangulo_texto = (x,y) 
+        self.pantalla.blit(superficie, rectangulo_texto)
 
-def ejecutar_juego():
+    def formatear_frase(self, frase_activa: str, ancho_maximo: int):
 
-    pygame.init()
-    pygame.display.set_caption("Final Sentence - Juego")
+        lista_palabras = frase_activa.split()   
+        frase = []
+        linea = ""    
 
-    entrada_usuario = ""
-    ronda = 1
-    tiempo_total = 30
-    inicio_tiempo = None
-    juego_activo = True
-    frase = generador_frases("https://poetrydb.org/author/Ernest Dowson")
+        for palabra in lista_palabras:
 
-    def reinicio():
-        nonlocal ronda, entrada_usuario, frase
-        ronda += 1
-        entrada_usuario = ""
-        frase = texto_generico()
-
-    def mostrar_game_over():
-        pantalla.fill(colores["Maroon"])
-        dibujar_texto("⏰ ¡Tiempo agotado!", font_title, colores["Warm"], 180, 130)
-        dibujar_texto(f"Puntaje final: {puntaje}", font_text, colores["Maroon"], 270, 230)
-        dibujar_texto("Presioná ENTER para volver al menú", font_text, colores["Maroon"], 200, 300)
-        pygame.display.flip()
-
-    # --- Bucle principal del juego ---
-    while True:
-        pantalla.fill(colores["Negro"])
-
-        if juego_activo:
-            if inicio_tiempo:
-                tiempo_restante = tiempo_total - (time.time() - inicio_tiempo)
+            if linea == "":
+                linea_actual = palabra # Valida si la primer la primer palabra pertenece a la frase o no 
             else:
-                tiempo_restante = tiempo_total
+                linea_actual = linea + " " + palabra # En caso de tener una palabra la linea siguiente que debe de agregar la linea y la palabra siguiente
 
-            if tiempo_restante <= 0:
-                juego_activo = False
-                continue
+            ancho_frase = font_title.size(linea_actual)[0] # Guardo el valor del espacio que almacena la palabra
 
-            dibujar_texto("FINAL SENTENCE", font_title, colores["Maroon"], 230, 30)
-            dibujar_texto(f"Ronda: {ronda}", font_text, colores["Maroon"], 30, 100)
-            dibujar_texto(f"Puntaje: {puntaje}", font_text, colores["Maroon"], 650, 100)
-            dibujar_texto(f"Tiempo: {int(tiempo_restante)}s", font_title, colores["Maroon"], 350, 100)
+            if ancho_frase <= ancho_maximo: # Valido que mi frase recien almacenada supere mi limite especificado
+                linea = linea_actual # Guardo la palabra formada ["HOLA COMO ESTAS"] y deja de estar en la segunda vuelta vacio la linea
+            else:
+                frase.append(linea) # En caso de que la frase supere el valor de mi ancho_maximo agrego la palabra en una lista aparte
+                linea = palabra # La palabra que supero el ancho_maximo lo guardo en la variable linea para generar la siguiente linea
 
-            dibujar_texto("Escribí esta frase:", font_text, colores["Belge"], 50, 160)
-            dibujar_texto(frase, font_text, colores["Belge"], 50, 200)
-            dibujar_texto(entrada_usuario, font_text, colores["Belge"], 50, 260)
+        if linea:
+            frase.append(linea) # Agrego toda la frase completa divida según mi ancho_maximo
+
+        return frase
+
+                
+    def ejecutar_juego(self):
+        while True:
+
+            self.dibujar_texto(f"Errores: {self.errores}", 100, 10)
+            self.dibujar_texto(f"Puntaje: {self.puntaje}", 1000, 10)
 
             for evento in pygame.event.get():
                 if evento.type == pygame.QUIT:
                     pygame.quit()
                     sys.exit()
+     
+            lineas = self.formatear_frase(self.frase_activa, 500)
+            
+            y = 150
+            for linea in lineas:
+                ancho_linea = font_title.size(linea)[0]
+                x = (ANCHO - ancho_linea) // 2 
+    
+                self.dibujar_texto(linea, x, y)
+                y += 40
 
-                elif evento.type == pygame.KEYDOWN:
-                    if evento.key == pygame.K_ESCAPE:
-                        return  # volver al menú
-                    elif evento.key == pygame.K_RETURN:
-                        if entrada_usuario == frase:
-                            puntaje += 20
-                            tiempo_total += 20
-                            reinicio()
-                        else:
-                            puntaje -= 5
-                        entrada_usuario = ""
-                    elif evento.key == pygame.K_BACKSPACE:
-                        entrada_usuario = entrada_usuario[:-1]
-                    else:
-                        entrada_usuario += evento.unicode
-                        if not inicio_tiempo:
-                            inicio_tiempo = time.time()
-                        if not frase.startswith(entrada_usuario):
-                            puntaje -= 1
-
-        else:
-            mostrar_game_over()
-            for evento in pygame.event.get():
-                if evento.type == pygame.QUIT:
-                    pygame.quit()
-                    sys.exit()
-                elif evento.type == pygame.KEYDOWN and evento.key == pygame.K_RETURN:
-                    return  # volver al menú
-
-        pygame.display.flip()
+            pygame.display.update()
+            self.reloj.tick(FPS)
