@@ -61,10 +61,10 @@ class ModalSalir:
         self.pantalla.blit(self.fondo_oscuro, (0, 0))
 
         rect_modal = (self.x, self.y, self.ancho_modal, self.alto_modal)
-        pygame.draw.rect(self.pantalla, colores["OldPaper"], rect_modal)
+        pygame.draw.rect(self.pantalla, colores["Negro"], rect_modal)
         pygame.draw.rect(self.pantalla, colores["BurnedEdge"], rect_modal, 3)
 
-        superficie_titulo = font_title.render("¿Seguro que desea Salir?", True, colores["BurnedEdge"])
+        superficie_titulo = font_title.render("¿Seguro que desea Salir?", True, colores["Belge"])
         self.pantalla.blit(superficie_titulo, superficie_titulo.get_rect(center=(self.x + self.ancho_modal // 2, self.y + 60)))
 
         # ========= HOVER Y CURSOR =========
@@ -75,20 +75,44 @@ class ModalSalir:
         else:
             pygame.mouse.set_cursor(pygame.SYSTEM_CURSOR_ARROW)
 
-        # Botón "Cancelar" con animación de saturación
-        color_cancelar = colores["DarkWood"]
+        # Botón "Cancelar" con efecto hover
+        color_cancelar = colores["Belge"]
+        escala_cancelar = 1.0
         if self.es_hover(self.boton_cancelar):
-            color_cancelar = self.oscurecer(colores["DarkWood"], 20)
-        pygame.draw.rect(self.pantalla, color_cancelar, self.boton_cancelar)
-        pygame.draw.rect(self.pantalla, colores["BurnedEdge"], self.boton_cancelar, 2)
-        superficie_cancelar = font_text.render("Cancelar", True, colores["Belge"])
-        self.pantalla.blit(superficie_cancelar, superficie_cancelar.get_rect(center=self.boton_cancelar.center))
+            color_cancelar = colores["Warm"]
+            escala_cancelar = 1.05
 
-        # Botón "Salir" con animación de saturación
-        color_salir = colores["DarkWood"]
+        superficie_cancelar = font_button_modal.render("Cancelar", True, color_cancelar)
+        if escala_cancelar != 1.0:
+            ancho = int(superficie_cancelar.get_width() * escala_cancelar)
+            alto = int(superficie_cancelar.get_height() * escala_cancelar)
+            superficie_cancelar = pygame.transform.smoothscale(superficie_cancelar, (ancho, alto))
+
+        rect_cancelar = superficie_cancelar.get_rect(center=self.boton_cancelar.center)
+        self.pantalla.blit(superficie_cancelar, rect_cancelar)
+
+        if self.es_hover(self.boton_cancelar):
+            start = (rect_cancelar.left, rect_cancelar.bottom + 5)
+            end = (rect_cancelar.right, rect_cancelar.bottom + 5)
+            pygame.draw.line(self.pantalla, color_cancelar, start, end, 3)
+
+        # Botón "Salir" con efecto hover
+        color_salir = colores["Belge"]
+        escala_salir = 1.0
         if self.es_hover(self.boton_salir):
-            color_salir = self.oscurecer(colores["DarkWood"], 20)
-        pygame.draw.rect(self.pantalla, color_salir, self.boton_salir)
-        pygame.draw.rect(self.pantalla, colores["BurnedEdge"], self.boton_salir, 2)
-        superficie_salir = font_text.render("Salir", True, colores["Belge"])
-        self.pantalla.blit(superficie_salir, superficie_salir.get_rect(center=self.boton_salir.center))
+            color_salir = colores["Warm"]
+            escala_salir = 1.05
+
+        superficie_salir = font_button_modal.render("Salir", True, color_salir)
+        if escala_salir != 1.0:
+            ancho = int(superficie_salir.get_width() * escala_salir)
+            alto = int(superficie_salir.get_height() * escala_salir)
+            superficie_salir = pygame.transform.smoothscale(superficie_salir, (ancho, alto))
+
+        rect_salir = superficie_salir.get_rect(center=self.boton_salir.center)
+        self.pantalla.blit(superficie_salir, rect_salir)
+
+        if self.es_hover(self.boton_salir):
+            start = (rect_salir.left, rect_salir.bottom + 5)
+            end = (rect_salir.right, rect_salir.bottom + 5)
+            pygame.draw.line(self.pantalla, color_salir, start, end, 3)

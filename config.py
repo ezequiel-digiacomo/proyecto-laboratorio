@@ -36,3 +36,5 @@ font_title = pygame.font.Font("./assets/fonts/SpecialElite-Regular.ttf", 46) # A
 font_subtitle_main = pygame.font.Font("./assets/fonts/SpecialElite-Regular.ttf", 40) # Cree subtitulos para el principal
 font_subtitle_opt = pygame.font.Font("./assets/fonts/SpecialElite-Regular.ttf", 32) # y para el menu de opciones
 font_text = pygame.font.Font("./assets/fonts/AndadaPro-VariableFont_wght.ttf", 12)
+font_button = pygame.font.Font("./assets/fonts/AndadaPro-VariableFont_wght.ttf", 20) # Fuente para botones
+font_button_modal = pygame.font.Font("./assets/fonts/SpecialElite-Regular.ttf", 28) # Fuente para botones del modal
