@@ -70,39 +70,30 @@ class Menu():
             elif i == 2:
                 self.area_opcion2 = parametro
 
-            print(parametro)
-
     def dibujar_titulo(self, texto, x, y):
         superficie = font_title.render(texto, True, colores["Warm"])
         rectangulo_texto = superficie.get_rect()
         rectangulo_texto = (x,y)
         self.pantalla.blit(superficie, rectangulo_texto)
 
-    def dibujar_frase(self):
-        frase = self.frases_menu.obtener_frase_actual()
-
-        # Dividir frase en líneas
-        palabras = frase.split()
-        lineas = []
-        linea_actual = ""
-        ancho_maximo = 230
-
+    def dividir_en_lineas(self, texto, ancho_max):
+        palabras, lineas, linea = texto.split(), [], ""
         for palabra in palabras:
-            prueba = linea_actual + palabra + " "
-            if font_leyenda.size(prueba)[0] <= ancho_maximo:
-                linea_actual = prueba
+            prueba = linea + palabra + " "
+            if font_leyenda.size(prueba)[0] <= ancho_max:
+                linea = prueba
             else:
-                if linea_actual:
-                    lineas.append(linea_actual.strip())
-                linea_actual = palabra + " "
-        if linea_actual:
-            lineas.append(linea_actual.strip())
+                if linea:
+                    lineas.append(linea.strip())
+                linea = palabra + " "
+        if linea:
+            lineas.append(linea.strip())
+        return lineas
 
-        # Dibujar cada línea en la hoja con rotación
-        for i, linea in enumerate(lineas):
-            superficie_linea = font_leyenda.render(linea, True, (35, 25, 15))
-            superficie_rotada = pygame.transform.rotate(superficie_linea, +5)
-            self.pantalla.blit(superficie_rotada, (175 + i * 2, 200 + i * 20))
+    def dibujar_frase(self):
+        for i, linea in enumerate(self.dividir_en_lineas(self.frases_menu.obtener_frase_actual(), 230)):
+            superficie = pygame.transform.rotate(font_leyenda.render(linea, True, (35, 25, 15)), 5)
+            self.pantalla.blit(superficie, (175 + i * 2, 200 + i * 20))
 
 
     def ejecutar(self):

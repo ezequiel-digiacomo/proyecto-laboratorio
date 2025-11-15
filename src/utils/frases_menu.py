@@ -23,7 +23,7 @@ class FrasesMenu:
         ]
         self.frase_actual = random.choice(self.frases)
         self.tiempo_cambio = pygame.time.get_ticks()
-        self.intervalo = 20000
+        self.intervalo = 25000
 
     def actualizar(self):
         tiempo_actual = pygame.time.get_ticks()
