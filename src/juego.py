@@ -10,7 +10,7 @@ class NewGame():
         self.pantalla =  pygame.display.set_mode((ANCHO, ALTO))
         self.reloj = pygame.time.Clock()
 
-        ANCHO_MAXIMO_FRASE = ANCHO - 300 # (1280 - 300 = 980px)
+        ANCHO_MAXIMO_FRASE = ANCHO - 500 # (1280 - 300 = 980px)
 
         # Obtenemos las frases largas originales
         frases_largas = selector()
@@ -39,6 +39,8 @@ class NewGame():
 
         self.input = ""
         self.indice = 0
+
+        
     
     def dibujar_texto(self, texto: str, x: int, y: int):
         superficie = font_title.render(texto, True, colores["Belge"]) 
@@ -126,8 +128,8 @@ class NewGame():
             except IndexError:
                 pass # Pasa si la lista de frases está vacía o si ganamos, falta logica cuando termina osea gané
 
-            Y_ACTUAL = 200 # Coordenada Y para la frase activa
-            X_INICIO = 150 # Coordenada X para la frase activa
+            Y_ACTUAL = 225 # Coordenada Y para la frase activa
+            X_INICIO = 250 # Coordenada X para la frase activa
             
             # 2a. Parte ya tipeada (en color "Warm")
             texto_tipeado = self.input
@@ -142,7 +144,20 @@ class NewGame():
             rect_restante = superficie_restante.get_rect(topleft=(x_restante, Y_ACTUAL))
             self.pantalla.blit(superficie_restante, rect_restante)
 
+            parpadeo_caret = (pygame.time.get_ticks() // 500) % 2 == 0 # cada medio segundo 500ms, me fijo si es par
+            
+            if parpadeo_caret: #cada 500ms esto es True
+                # posicion en x de la barrita que parpadea
+                caret_x = rect_tipeado.right
+                
+                # Usamos la altura de la fuente (en lugar de la del rect) para que se 
+                # dibuje correctamente incluso cuando el input está vacío.
+                font_height = font_title.get_height() 
+                caret_y_start = Y_ACTUAL
+                caret_y_end = Y_ACTUAL + font_height
 
+                # Dibujar la línea (cursor) de color "Warm" y 2px de ancho
+                pygame.draw.line(self.pantalla, colores["Warm"], (caret_x, caret_y_start), (caret_x, caret_y_end), 2)
 
             self.dibujar_texto(frase_siguiente_1, X_INICIO, Y_ACTUAL + 60) # 60 píxeles abajo
             self.dibujar_texto(frase_siguiente_2, X_INICIO, Y_ACTUAL + 120) # 120 píxeles abajo
@@ -160,9 +175,7 @@ class NewGame():
                     self.input += str(evento.unicode) # se escribe en el atributo la tecla
                     self.indice += 1 # indica el indice que estamos escribiendo
                     print(self.input)
-                    if self.input[0:self.indice] == self.frase[self.frase_activa][0:self.indice]: # si la frase hasta ahora conincide
-                        continue # ta todo bien
-                    else: # si no coincide es decir erraste
+                    if not self.input[0:self.indice] == self.frase[self.frase_activa][0:self.indice]: # si la frase hasta ahora conincide
                         self.input = ""
                         self.indice = 0
                         self.errores += 1
