@@ -10,7 +10,7 @@ class NewGame():
         self.pantalla =  pygame.display.set_mode((ANCHO, ALTO))
         self.reloj = pygame.time.Clock()
 
-        ANCHO_MAXIMO_FRASE = ANCHO - 300 # (1280 - 300 = 980px)
+        ANCHO_MAXIMO_FRASE = ANCHO - 500 # (1280 - 300 = 980px)
 
         # Obtenemos las frases largas originales
         frases_largas = selector()
@@ -39,7 +39,8 @@ class NewGame():
 
         self.input = ""
         self.indice = 0
-    
+        self.errores_posiciones = []  # Posiciones donde hubo error
+
     def dibujar_texto(self, texto: str, x: int, y: int):
         superficie = font_title.render(texto, True, colores["Belge"]) 
         rectangulo_texto = superficie.get_rect()
@@ -53,7 +54,6 @@ class NewGame():
         linea = ""    
 
         for palabra in lista_palabras:
-
             if linea == "":
                 linea_actual = palabra # Valida si la primer la primer palabra pertenece a la frase o no 
             else:
@@ -126,23 +126,49 @@ class NewGame():
             except IndexError:
                 pass # Pasa si la lista de frases está vacía o si ganamos, falta logica cuando termina osea gané
 
-            Y_ACTUAL = 200 # Coordenada Y para la frase activa
-            X_INICIO = 150 # Coordenada X para la frase activa
-            
-            # 2a. Parte ya tipeada (en color "Warm")
-            texto_tipeado = self.input
-            superficie_tipeada = font_title.render(texto_tipeado, True, colores["Warm"])
-            rect_tipeado = superficie_tipeada.get_rect(topleft=(X_INICIO, Y_ACTUAL))
-            self.pantalla.blit(superficie_tipeada, rect_tipeado)
-            
-            # 2b. Parte restante (en color "Belge")
-            texto_restante = frase_actual_str[self.indice:]
-            superficie_restante = font_title.render(texto_restante, True, colores["Belge"])
-            x_restante = X_INICIO + rect_tipeado.width # La ponemos justo después de la parte tipeada
-            rect_restante = superficie_restante.get_rect(topleft=(x_restante, Y_ACTUAL))
-            self.pantalla.blit(superficie_restante, rect_restante)
+            Y_ACTUAL = 225 # Coordenada Y para la frase activa
+            X_INICIO = 250 # Coordenada X para la frase activa
 
+            # Renderizar frase completa carácter por carácter
+            x_actual = X_INICIO
+            for i, char in enumerate(frase_actual_str):
+                if i < self.indice:
+                    # Ya tipeado correctamente
+                    color = colores["Warm"]
+                elif i in self.errores_posiciones:
+                    # Error en esta posición
+                    color = colores["Red"]
+                else:
+                    # Aún no tipeado
+                    color = colores["Belge"]
 
+                superficie_char = font_title.render(char, True, color)
+
+                # Si es un error, dibujar rectángulo
+                if i in self.errores_posiciones:
+                    rect_char = superficie_char.get_rect(topleft=(x_actual, Y_ACTUAL))
+                    pygame.draw.rect(self.pantalla, colores["Red"], rect_char, 2)
+
+                self.pantalla.blit(superficie_char, (x_actual, Y_ACTUAL))
+                x_actual += superficie_char.get_width()
+
+            # Guardar el ancho total de la parte tipeada para el caret
+            rect_tipeado_width = font_title.size(frase_actual_str[:self.indice])[0] if self.indice > 0 else 0
+
+            parpadeo_caret = (pygame.time.get_ticks() // 500) % 2 == 0 # cada medio segundo 500ms, me fijo si es par
+
+            if parpadeo_caret: #cada 500ms esto es True
+                # posicion en x de la barrita que parpadea
+                caret_x = X_INICIO + rect_tipeado_width
+                
+                # Usamos la altura de la fuente (en lugar de la del rect) para que se 
+                # dibuje correctamente incluso cuando el input está vacío.
+                font_height = font_title.get_height() 
+                caret_y_start = Y_ACTUAL
+                caret_y_end = Y_ACTUAL + font_height
+
+                # Dibujar la línea (cursor) de color "Warm" y 2px de ancho
+                pygame.draw.line(self.pantalla, colores["Warm"], (caret_x, caret_y_start), (caret_x, caret_y_end), 2)
 
             self.dibujar_texto(frase_siguiente_1, X_INICIO, Y_ACTUAL + 60) # 60 píxeles abajo
             self.dibujar_texto(frase_siguiente_2, X_INICIO, Y_ACTUAL + 120) # 120 píxeles abajo
@@ -160,18 +186,20 @@ class NewGame():
                     self.input += str(evento.unicode) # se escribe en el atributo la tecla
                     self.indice += 1 # indica el indice que estamos escribiendo
                     print(self.input)
-                    if self.input[0:self.indice] == self.frase[self.frase_activa][0:self.indice]: # si la frase hasta ahora conincide
-                        continue # ta todo bien
-                    else: # si no coincide es decir erraste
+                    if not self.input[0:self.indice] == self.frase[self.frase_activa][0:self.indice]: # si la frase hasta ahora no coincide
+                        # Error: marca posición y acumula errores
+                        if (self.indice - 1) not in self.errores_posiciones:
+                            self.errores_posiciones.append(self.indice - 1)
                         self.input = ""
                         self.indice = 0
                         self.errores += 1
                         if self.errores % 3 == 0 : # cada 3 errores
-                            running = self.cargar_disparar() # puede cambiar el estado del while True 
-                if self.input == self.frase[self.frase_activa]: # si la frase completa coincide 
+                            running = self.cargar_disparar() # puede cambiar el estado del while True
+                if self.input == self.frase[self.frase_activa]: # si la frase completa coincide
                     self.frase_activa += 1 # paso a la linea que sigue
                     self.input = "" # reincio input del usuario
                     self.indice = 0 # reinicio indice del input del usuario
+                    self.errores_posiciones = []  # Limpia errores al pasar de línea
 
 
             pygame.display.update()
