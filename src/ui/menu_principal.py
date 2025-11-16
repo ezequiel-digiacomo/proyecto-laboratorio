@@ -145,6 +145,10 @@ class Menu():
                     if self.area_opcion0.collidepoint(click_pos):
                         inicio = NewGame()
                         inicio.ejecutar_juego()
+                    elif self.area_opcion1.collidepoint(click_pos):  # ✅ nueva conexión
+                        from src.ui.menu_opciones import MenuOpciones
+                        menu_opciones = MenuOpciones()
+                        menu_opciones.ejecutar()
                     elif self.area_opcion2.collidepoint(click_pos):
                         self.modal_salir.abrir()
 
