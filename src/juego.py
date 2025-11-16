@@ -1,15 +1,3 @@
-"""
-Tarea Pendiente juego.py: 
-
-    - Realizar funciones: Puntaje y Reinicio de partida
-    - Mejorar la generación de texto en cuanto lo visual
-    - Limpiar el bucle de ejecución haciendo más legible el código
-    - Implementar: Sónidos e imagenes al juego 
-    - Comprobación: Verificar que la función generador_frases ubicada en la carpeta palabras.py funcione
-
-"""
-
-
 from config import *
 from src.utils.diccionario_textos import *
 import pygame, sys
@@ -22,7 +10,17 @@ class NewGame():
         self.pantalla =  pygame.display.set_mode((ANCHO, ALTO))
         self.reloj = pygame.time.Clock()
 
-        self.frase = selector()
+        ANCHO_MAXIMO_FRASE = ANCHO - 300 # (1280 - 300 = 980px)
+
+        # Obtenemos las frases largas originales
+        frases_largas = selector()
+
+        # Creamos la lista de frases formateadas
+        self.frase = []
+        for frase_original in frases_largas:
+            renglones_formateados = self.formatear_frase(frase_original, ANCHO_MAXIMO_FRASE) #formatea
+            self.frase.extend(renglones_formateados)# mete los renglones o el renglon original
+
         self.frase_activa = 0
 
         self.cargador = [False] * 6 # CAPACIDAD DEL CARGADOR DE LA RULETA
@@ -35,7 +33,7 @@ class NewGame():
         self.ronda = 0
 
         self.errores = 0
-        self.errores_activos = [False] * 3 # 
+        self.errores_activos = [False] * 3  
 
         self.puntaje = 0
 
@@ -76,15 +74,15 @@ class NewGame():
         return frase
 
     def cargar_disparar(self):
-            for i in range(len(self.cargador)):
-                if self.cargador[i] is False:
+            for i in range(len(self.cargador)): # recorro los espacios del cargador
+                if self.cargador[i] is False:  # si esta vacia la cargo
                     self.cargador[i] = True
-                    break
-            bala_actual = random.choice(self.cargador)
-            self.errores_activos = [False] * 3
-            if bala_actual == True:
+                    break # corta cuando cargo un True en el cargador (siempre voy a cargar de a una bala)
+            bala_actual = random.choice(self.cargador) # salio la bala?
+            self.errores_activos = [False] * 3 # reseteo y actualizo los errores previos a cargar una bala (X.X.X) si tacha 3 carga bala
+            if bala_actual == True:  # si salio la bala
                 print(f"estado de bala {bala_actual}")
-            return not bala_actual
+            return not bala_actual # retorno negado, de esto depende el while True del juego
 
 
                 
@@ -94,31 +92,25 @@ class NewGame():
         while running:
 
             self.pantalla.fill(colores["Negro"])
-            # --- AÑADIR ESTE BLOQUE PARA EL TIMER ---
             # Calcular tiempo
             tiempo_actual = pygame.time.get_ticks()
             tiempo_transcurrido = (tiempo_actual - self.tiempo_inicio) // 1000
             tiempo_restante = self.cuenta_regresiva - tiempo_transcurrido
-
-            # Comprobar si se acabó el tiempo
-            if tiempo_restante <= 0:
-                self.vivo = False # Marcamos el fin de la partida
-                break # Salimos del bucle 'while True', volviendo al menú
-
             # Formatear el texto del timer
             minutos = tiempo_restante // 60
             segundos = tiempo_restante % 60
             texto_timer = f"{minutos:02}:{segundos:02}"
-            
-            # Dibujar el timer (abajo a la izquierda)
             self.dibujar_texto(texto_timer, 100, ALTO - 70)
-            # --- FIN DEL BLOQUE AÑADIDO ---
+
+            # Comprobar si se acabó el tiempo
+            if tiempo_restante <= 0:
+                self.vivo = False # Marcamos el fin de la partida
+                running = False # Salimos del bucle 'while True', volviendo al menú
 
             self.dibujar_texto(f"Errores: {self.errores}", 100, 10)
             self.dibujar_texto(f"Puntaje: {self.puntaje}", 1000, 10)
 
-            # --- AÑADIDO ---
-            # 2. Lógica para obtener y dibujar las 3 frases
+            # Lógica para obtener y dibujar las 3 frases
             frase_actual_str = ""
             frase_siguiente_1 = ""
             frase_siguiente_2 = ""
@@ -133,11 +125,10 @@ class NewGame():
                 if self.frase_activa + 2 < len(self.frase):
                     frase_siguiente_2 = self.frase[self.frase_activa + 2]
             except IndexError:
-                pass # Pasa si la lista de frases está vacía o si ganamos
+                pass # Pasa si la lista de frases está vacía o si ganamos, falta logica cuando termina osea gané
 
-            # --- DIBUJAR LÍNEA ACTUAL (con progreso) ---
-            Y_ACTUAL = 200 # Coordenada Y para la línea principal
-            X_INICIO = 150
+            Y_ACTUAL = 200 # Coordenada Y para la frase activa
+            X_INICIO = 150 # Coordenada X para la frase activa
             
             # 2a. Parte ya tipeada (en color "Warm")
             texto_tipeado = self.input
@@ -153,37 +144,35 @@ class NewGame():
             self.pantalla.blit(superficie_restante, rect_restante)
 
 
-            # --- DIBUJAR LÍNEAS SIGUIENTES ---
-            # (Usamos tu función dibujar_texto, que usa la fuente grande y color Belge)
+
             self.dibujar_texto(frase_siguiente_1, X_INICIO, Y_ACTUAL + 60) # 60 píxeles abajo
             self.dibujar_texto(frase_siguiente_2, X_INICIO, Y_ACTUAL + 120) # 120 píxeles abajo
-            # --- FIN DEL BLOQUE AÑADIDO ---
 
             for evento in pygame.event.get():
                 if evento.type == pygame.QUIT:
                     pygame.quit()
                     sys.exit()
-                if evento.type == pygame.KEYDOWN: 
+                if evento.type == pygame.KEYDOWN: # evento pulsacion de tecla
 
-                    if not evento.unicode:
+                    if not evento.unicode: # si no es un caracter imprimible crtl, shift
                         continue 
 
                     print(self.frase[self.frase_activa])
-                    self.input += str(evento.unicode)
-                    self.indice += 1
+                    self.input += str(evento.unicode) # se escribe en el atributo la tecla
+                    self.indice += 1 # indica el indice que estamos escribiendo
                     print(self.input)
-                    if self.input[0:self.indice] == self.frase[self.frase_activa][0:self.indice]:
-                        continue
-                    else:
+                    if self.input[0:self.indice] == self.frase[self.frase_activa][0:self.indice]: # si la frase hasta ahora conincide
+                        continue # ta todo bien
+                    else: # si no coincide es decir erraste
                         self.input = ""
                         self.indice = 0
                         self.errores += 1
-                        if self.errores % 3 == 0 :
-                            running = self.cargar_disparar()
-                if self.input == self.frase[self.frase_activa]:
-                    self.frase_activa += 1
-                    self.input = ""
-                    self.indice = 0
+                        if self.errores % 3 == 0 : # cada 3 errores
+                            running = self.cargar_disparar() # puede cambiar el estado del while True 
+                if self.input == self.frase[self.frase_activa]: # si la frase completa coincide 
+                    self.frase_activa += 1 # paso a la linea que sigue
+                    self.input = "" # reincio input del usuario
+                    self.indice = 0 # reinicio indice del input del usuario
 
 
             pygame.display.update()
