@@ -24,3 +24,7 @@ font_text = pygame.font.Font("./assets/fonts/AndadaPro-VariableFont_wght.ttf", 1
 
 basedir = Path(__file__).resolve().parent
 sounds = basedir / "assets" / "sounds"
+
+# Volúmenes iniciales (variables para después manejar en los slider de menu_opciones)
+volumen_musica = 0.5   # 50%
+volumen_sfx = 0.5      # 50%
