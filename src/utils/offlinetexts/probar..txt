@@ -1,0 +1,23 @@
+Se ha progresado.
+Hora de probar todas teclas.
+
+Primero los números:
+1234567890
+
+Después las letras:
+qwertyuiop
+asdfghjklñ
+zxcvbnm
+
+Ahora los símbolos:
+---
+'''
+…
+,,,
+;;;
+:::
+!!!
+???
+
+La práctica termina cuando se completa el texto.
+Prepárate para el verdadero juego.

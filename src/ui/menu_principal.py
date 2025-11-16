@@ -1,6 +1,6 @@
 import pygame, sys, math, random
 from config import *
-from src.juego import *
+from src.juego import NewGame
 from src.ui.modal_salir import ModalSalir
 from src.utils.frases_menu import FrasesMenu
 
@@ -143,11 +143,8 @@ class Menu():
                 if not self.modal_salir.activo and evento.type == pygame.MOUSEBUTTONDOWN:
                     click_pos = evento.pos
                     if self.area_opcion0.collidepoint(click_pos):
-                        ejecutar_juego()
-                    elif self.area_opcion1.collidepoint(click_pos):  # ✅ nueva conexión
-                        from src.ui.menu_opciones import MenuOpciones
-                        menu_opciones = MenuOpciones()
-                        menu_opciones.ejecutar()
+                        inicio = NewGame()
+                        inicio.ejecutar_juego()
                     elif self.area_opcion2.collidepoint(click_pos):
                         self.modal_salir.abrir()
 
