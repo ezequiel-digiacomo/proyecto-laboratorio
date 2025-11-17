@@ -32,6 +32,10 @@ class NewGame():
         ANCHO_MAXIMO_FRASE = ANCHO - 500
         frases_largas = selector()
 
+        ruta_error = os.path.join("assets", "sfx", "error_sound.wav")
+        self.error_sound = pygame.mixer.Sound(ruta_error)
+        self.error_sound.set_volume(0.4)
+
         self.frase = []
         for frase_original in frases_largas:
             renglones_formateados = self.formatear_frase(frase_original, ANCHO_MAXIMO_FRASE)
@@ -146,8 +150,12 @@ class NewGame():
                 ahora = pygame.time.get_ticks()
 
                 if ahora - self.tiempo_ultima_animacion > self.velocidad_retroceso:
-                    self.tiempo_ultima_animacion = ahora
-                    self.indice_a_borrar -= 1  # borrar una letra por frame
+
+                    #Sonido de Error:
+                    if ahora - self.tiempo_ultima_animacion > self.velocidad_retroceso:
+                        self.error_sound.play(maxtime=80)
+                        self.tiempo_ultima_animacion = ahora
+                        self.indice_a_borrar -= 1
 
                     if self.indice_a_borrar < 0:
                         # Animación terminada
@@ -265,7 +273,7 @@ class NewGame():
                         if self.errores % 3 == 0:
                             running = self.cargar_disparar()
                             self.errores_activos = [False] * 3  # reset visual
-                            
+
                 if self.input == self.frase[self.frase_activa]: # si la frase completa coincide
                     self.frase_activa += 1 # paso a la linea que sigue
                     self.input = "" # reincio input del usuario

@@ -3,9 +3,8 @@ import random
 import json
 import os
 
-
 def breaking_bad():
-    url = "https://api.breakingbadquotes.xyz/v1/quotes/20" # el 20 indica cuantas frases trae
+    url = "https://api.breakingbadquotes.xyz/v1/quotes/7" # el 20 indica cuantas frases trae
 
     respuesta = requests.get(url)
     datos = respuesta.json()
