@@ -301,8 +301,6 @@ class NewGame():
                 superficie_modal.set_alpha(240)
                 self.pantalla.blit(superficie_modal, (fondo_x, fondo_y))
                 pygame.draw.rect(self.pantalla, (30, 30, 30, 190), (fondo_x, fondo_y, ancho_modal, alto_modal), 2)
-                
-                self.dibujar_texto("Estadisticas", fondo_x * 2, fondo_y + 60)
 
                 for evento in pygame.event.get():
                     if evento.type == pygame.KEYDOWN:
@@ -310,5 +308,12 @@ class NewGame():
                             self.mostrar_estadisticas = False   
                             break
 
+                self.dibujar_texto("Estadisticas", fondo_x * 2, fondo_y + 60)
+                self.dibujar_texto(f"Tiempo Transcurrido:{minutos:02}:{segundos:02}", fondo_x + 60, fondo_y + 170)
+                self.dibujar_texto(f"Palabras Tipeadas: {self.palabras_tipeadas}", fondo_x + 60, fondo_y + 230)
+                self.dibujar_texto(f"Errores Totales: {self.errores}", fondo_x + 60, fondo_y + 280)
+                self.dibujar_texto("Pulsa TAB para salir", fondo_x + 60, fondo_y + 380)
+
+               
             pygame.display.update()
             self.reloj.tick(FPS)
