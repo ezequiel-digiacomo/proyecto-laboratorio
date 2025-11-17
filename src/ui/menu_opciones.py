@@ -5,7 +5,7 @@ TAREAS PROPIAS:
 * Cambiar el ícono en el borde de la ventana por alguno fachero
 * Disfruta el proceso flaco y divertite - Te kiero <3
 '''
-import pygame, sys, math, random
+import pygame, sys, math, random, os
 import config
 from config import *
 from src.ui.slider import Slider
@@ -23,7 +23,7 @@ class MenuOpciones:
 
 
 
-        ruta_sonido_hover = os.path.join("assets", "sounds", "assets_sfx_options-click.wav")
+        ruta_sonido_hover = os.path.join("assets", "sfx", "options-click.wav")
         self.sonido_hover = pygame.mixer.Sound(ruta_sonido_hover)
         self.sonido_hover.set_volume(0.3)  # volumen entre 0.0 y 1.0
         self.boton_actual = None  # para evitar que suene varias veces seguidas
