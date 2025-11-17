@@ -3,28 +3,38 @@ from config import *
 from src.juego import NewGame
 from src.ui.modal_salir import ModalSalir
 from src.utils.frases_menu import FrasesMenu
+import os
 
 
 class Menu():
+
     def __init__(self):
         pygame.init()
         pygame.mixer.init()   # inicializa audio
 
-        #  musica de fondo 
-        pygame.mixer.music.load(sounds / "musica-menu.ogg")  # ruta desde config
+        # música de fondo 
+        pygame.mixer.music.load(sounds / "musica-menu.ogg")
         pygame.mixer.music.set_volume(0.5)
-        pygame.mixer.music.play(-1)  # loop infinito
-        
-        
-        self.opciones= ["Jugar", "Opciones", "Salir"]
+        pygame.mixer.music.play(-1)
+
+        # sonido hover
+        ruta_base = os.path.dirname(os.path.abspath(__file__))
+        ruta_sonido_hover = os.path.join(ruta_base, "..", "..", "assets", "sfx", "options-click.wav")
+        ruta_sonido_hover = os.path.normpath(ruta_sonido_hover)
+        self.sonido_hover = pygame.mixer.Sound(ruta_sonido_hover)
+        self.sonido_hover.set_volume(0.3)
+        self.boton_actual = None
+
+        # opciones del menú
+        self.opciones = ["Jugar", "Opciones", "Salir"]
         self.reloj = pygame.time.Clock()
         self.pantalla = aplicar_modo_pantalla()
 
-        # Agregué el ícono pa desbordar facha
+        # ícono
         icono = pygame.image.load("assets/images/revolver_icon2.png")
         pygame.display.set_icon(icono)
 
-        # Agregado de fondo y "capa de titileo"
+        # fondo
         self.fondo = pygame.image.load("assets/images/mainmenu_background.png").convert()
         self.fondo = pygame.transform.scale(self.fondo, (ANCHO, ALTO))
         self.overlay = pygame.Surface((ANCHO, ALTO))
@@ -39,30 +49,27 @@ class Menu():
         pygame.display.set_caption("Menu Principal")
 
     def dibujar_opciones(self):
-        pos_mouse = pygame.mouse.get_pos() # Obtengo la posición del mouse
+        pos_mouse = pygame.mouse.get_pos()
+        boton_hover_actual = None
 
         for i, texto in enumerate(self.opciones):
-            # Detectar si el mouse está sobre la opción
             area_actual = getattr(self, f"area_opcion{i}")
             esta_sobre = area_actual and area_actual.collidepoint(pos_mouse)
 
-            # Color y escala base
             color = colores["Belge"]
             escala = 1.0
 
-            # Si el mouse pasa por arriba, aplicar efecto
             if esta_sobre:
-                color = colores["Warm"]  # Cambiá por el color x más contraste
-                escala = 1.05  # Leve aumento 
+                color = colores["Warm"]
+                escala = 1.05
+                boton_hover_actual = texto
 
-            # Renderizar texto normal y luego escalarlo
             superficie = font_subtitle_main.render(texto, True, color)
             if escala != 1.0:
                 ancho = int(superficie.get_width() * escala)
                 alto = int(superficie.get_height() * escala)
                 superficie = pygame.transform.smoothscale(superficie, (ancho, alto))
 
-            # Calcular posición (alinear por la derecha)
             parametro = superficie.get_rect(topright=(ANCHO - 100, 200 + i * 80))
             self.pantalla.blit(superficie, parametro)
 
@@ -71,18 +78,16 @@ class Menu():
                 end = (parametro.right, parametro.bottom + 5)
                 pygame.draw.line(self.pantalla, color, start, end, 3)
 
-            if i == 0:
-                self.area_opcion0 = parametro
-            elif i == 1:
-                self.area_opcion1 = parametro
-            elif i == 2:
-                self.area_opcion2 = parametro
+            setattr(self, f"area_opcion{i}", parametro)
+
+        if boton_hover_actual != self.boton_actual:
+            if boton_hover_actual is not None:
+                self.sonido_hover.play()
+            self.boton_actual = boton_hover_actual
 
     def dibujar_titulo(self, texto, x, y):
         superficie = font_title.render(texto, True, colores["Warm"])
-        rectangulo_texto = superficie.get_rect()
-        rectangulo_texto = (x,y)
-        self.pantalla.blit(superficie, rectangulo_texto)
+        self.pantalla.blit(superficie, (x, y))
 
     def dividir_en_lineas(self, texto, ancho_max):
         palabras, lineas, linea = texto.split(), [], ""
@@ -103,12 +108,10 @@ class Menu():
             superficie = pygame.transform.rotate(font_leyenda.render(linea, True, (35, 25, 15)), 5)
             self.pantalla.blit(superficie, (175 + i * 2, 200 + i * 20))
 
-
     def ejecutar(self):
-        pygame.mouse.set_cursor(pygame.SYSTEM_CURSOR_ARROW) # Reiniciar el cursor
+        pygame.mouse.set_cursor(pygame.SYSTEM_CURSOR_ARROW)
         while True:
-            #self.pantalla.fill(colores["Negro"]) #Con esto limpio el modal
-            self.pantalla.blit(self.fondo, (0, 0)) # Reemplacé el fondo negro por la imágen
+            self.pantalla.blit(self.fondo, (0, 0))
 
             # Efecto de titileo de luz
             brillo = 15 + abs(math.sin(pygame.time.get_ticks() * 0.001)) * 80
@@ -124,13 +127,11 @@ class Menu():
             self.dibujar_opciones()
             self.dibujar_frase()
 
-            # Mouse de la manito pa los botones
+            # Cursor tipo mano
             pos_mouse = pygame.mouse.get_pos()
-
             if (self.area_opcion0 and self.area_opcion0.collidepoint(pos_mouse)) or \
-            (self.area_opcion1 and self.area_opcion1.collidepoint(pos_mouse)) or \
-            (self.area_opcion2 and self.area_opcion2.collidepoint(pos_mouse)):
-
+               (self.area_opcion1 and self.area_opcion1.collidepoint(pos_mouse)) or \
+               (self.area_opcion2 and self.area_opcion2.collidepoint(pos_mouse)):
                 pygame.mouse.set_cursor(pygame.SYSTEM_CURSOR_HAND)
             else:
                 pygame.mouse.set_cursor(pygame.SYSTEM_CURSOR_ARROW)
@@ -139,8 +140,7 @@ class Menu():
                 if evento.type == pygame.QUIT:
                     pygame.quit()
                     sys.exit()
-                    
-                #Aca veririfico las acciones del Modal Salir
+
                 accion_modal = self.modal_salir.manejar_eventos(evento)
                 if accion_modal == 'salir':
                     pygame.quit()
@@ -151,16 +151,21 @@ class Menu():
                 if not self.modal_salir.activo and evento.type == pygame.MOUSEBUTTONDOWN:
                     click_pos = evento.pos
                     if self.area_opcion0.collidepoint(click_pos):
+                        pygame.mixer.music.fadeout(1000)
                         inicio = NewGame()
                         inicio.ejecutar_juego()
-                    elif self.area_opcion1.collidepoint(click_pos):  # ✅ nueva conexión
+                        pygame.mixer.music.load(sounds / "musica-menu.ogg")
+                        pygame.mixer.music.set_volume(0.5)
+                        pygame.mixer.music.play(-1)
+
+                    elif self.area_opcion1.collidepoint(click_pos):
                         from src.ui.menu_opciones import MenuOpciones
                         menu_opciones = MenuOpciones()
                         menu_opciones.ejecutar()
+
                     elif self.area_opcion2.collidepoint(click_pos):
                         self.modal_salir.abrir()
 
             self.modal_salir.dibujar()
-
             pygame.display.update()
             self.reloj.tick(FPS)
