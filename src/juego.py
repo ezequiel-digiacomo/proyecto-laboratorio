@@ -14,6 +14,7 @@ class NewGame():
         self.fondo = pygame.transform.scale(self.fondo, (ANCHO, ALTO))
 
         ANCHO_MAXIMO_FRASE = ANCHO - 500 # (1280 - 300 = 980px)
+
         # Musica del juego 
         pygame.mixer.music.load("assets/sounds/musica_juego.wav")
         pygame.mixer.music.set_volume(0.5)
@@ -29,28 +30,26 @@ class NewGame():
         for s in self.sonidos_teclas:
             s.set_volume(0.4)
 
-        ANCHO_MAXIMO_FRASE = ANCHO - 500
-        frases_largas = selector()
 
+        # Sonido de error
         ruta_error = os.path.join("assets", "sfx", "error_sound.wav")
         self.error_sound = pygame.mixer.Sound(ruta_error)
         self.error_sound.set_volume(0.4)
 
+        # Lógica inicial - Frase
+        frases_largas = selector()
         self.frase = []
         for frase_original in frases_largas:
             renglones_formateados = self.formatear_frase(frase_original, ANCHO_MAXIMO_FRASE)
             self.frase.extend(renglones_formateados)
-
+        
+        # Atributos del juego
         self.frase_activa = 0
-
         self.vivo = True 
-
         self.tambor = [False] * 6   # 6 cámaras EX VARIABLE self.cargador
         self.pos_tambor = 0         # posición actual del disparo
-    
         self.cuenta_regresiva = 240 # en segundos : 4 minutos
         self.cargador = [False] * 6
-        
         self.tiempo_inicio = pygame.time.get_ticks()
         self.ronda = 0
         self.errores = 0
@@ -65,6 +64,10 @@ class NewGame():
         self.tiempo_ultima_animacion = 0
         self.velocidad_retroceso = 45  # ms por letra (ajustable)
         self.indice_a_borrar = 0
+
+        # Atributo de estádisticas
+        self.palabras_tipeadas = 0
+        self.mostrar_estadisticas = False
 
     def dibujar_texto(self, texto: str, x: int, y: int):
         superficie = font_title.render(texto, True, colores["Belge"])
@@ -240,10 +243,16 @@ class NewGame():
                 if self.animando_retroceso:
                     continue
 
- 
                 if evento.type == pygame.KEYDOWN: # evento pulsacion de tecla
+
                     if not evento.unicode:
                         continue
+                    
+                    # Si detecta la tecla TAB abre las estádisticas y pasa el error
+                    if evento.key == pygame.K_TAB:
+                        self.mostrar_estadisticas = True
+                        continue
+
 
                     # Sonido de tipeo
                     if self.sonidos_teclas:
@@ -252,7 +261,7 @@ class NewGame():
                     print(self.frase[self.frase_activa])
                     self.input += str(evento.unicode)
                     self.indice += 1
-                    print(self.input)
+                    self.palabras_tipeadas += len(self.input)
 
                     if not self.input[0:self.indice] == self.frase[self.frase_activa][0:self.indice]: # si la frase hasta ahora conincide
                         # Error: marca posición y acumula errores
@@ -274,17 +283,32 @@ class NewGame():
                             running = self.cargar_disparar()
                             self.errores_activos = [False] * 3  # reset visual
 
-                if self.input == self.frase[self.frase_activa]: # si la frase completa coincide
-                    self.frase_activa += 1 # paso a la linea que sigue
-                    self.input = "" # reincio input del usuario
-                    self.indice = 0 # reinicio indice del input del usuario
-                    self.errores_posiciones = []  # Limpia errores al pasar de línea
-
                 if self.input == self.frase[self.frase_activa]:
+                    palabras_en_linea = len(self.frase[self.frase_activa].split())
+                    self.palabras_tipeadas += palabras_en_linea
                     self.frase_activa += 1
                     self.input = ""
                     self.indice = 0
                     self.errores_posiciones = []
+
+            if self.mostrar_estadisticas:
+
+                ancho_modal = 800
+                alto_modal = 500
+                fondo_x = (ANCHO - ancho_modal) // 2
+                fondo_y = (ALTO - alto_modal) // 2
+                superficie_modal = pygame.Surface((ancho_modal, alto_modal))
+                superficie_modal.set_alpha(240)
+                self.pantalla.blit(superficie_modal, (fondo_x, fondo_y))
+                pygame.draw.rect(self.pantalla, (30, 30, 30, 190), (fondo_x, fondo_y, ancho_modal, alto_modal), 2)
+                
+                self.dibujar_texto("Estadisticas", fondo_x * 2, fondo_y + 60)
+
+                for evento in pygame.event.get():
+                    if evento.type == pygame.KEYDOWN:
+                        if evento.key == pygame.K_TAB:
+                            self.mostrar_estadisticas = False   
+                            break
 
             pygame.display.update()
             self.reloj.tick(FPS)
