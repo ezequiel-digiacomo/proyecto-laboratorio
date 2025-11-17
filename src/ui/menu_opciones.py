@@ -21,6 +21,13 @@ class MenuOpciones:
         self.pantalla = aplicar_modo_pantalla()
         self.volumen = 50
 
+
+
+        ruta_sonido_hover = os.path.join("assets", "sounds", "assets_sfx_options-click.wav")
+        self.sonido_hover = pygame.mixer.Sound(ruta_sonido_hover)
+        self.sonido_hover.set_volume(0.3)  # volumen entre 0.0 y 1.0
+        self.boton_actual = None  # para evitar que suene varias veces seguidas
+
         # === SLIDER ===
         self.slider = Slider(ANCHO//2 + 200, 260 - 3, valor_inicial=self.volumen,
                              color_base=colores["Belge"], color_fill=colores["Warm"])
