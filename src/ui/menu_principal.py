@@ -1,5 +1,7 @@
 import pygame, sys, math, random
+import pygame, sys, math, random
 from config import *
+from src.juego import NewGame
 from src.juego import NewGame
 from src.ui.modal_salir import ModalSalir
 from src.utils.frases_menu import FrasesMenu
@@ -44,6 +46,8 @@ class Menu():
         self.area_opcion1 = None
         self.area_opcion2 = None
         self.modal_salir = ModalSalir(self.pantalla)
+        self.frases_menu = FrasesMenu()
+
         self.frases_menu = FrasesMenu()
 
         pygame.display.set_caption("Menu Principal")
