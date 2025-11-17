@@ -1,4 +1,5 @@
 import pygame
+from pathlib import Path
 
 pygame.init()
 
@@ -39,3 +40,12 @@ font_text = pygame.font.Font("./assets/fonts/AndadaPro-VariableFont_wght.ttf", 1
 font_button = pygame.font.Font("./assets/fonts/AndadaPro-VariableFont_wght.ttf", 20) # Fuente para botones
 font_button_modal = pygame.font.Font("./assets/fonts/SpecialElite-Regular.ttf", 28) # Fuente para botones del modal
 font_leyenda = pygame.font.Font("./assets/fonts/SpecialElite-Regular.ttf", 11) # Fuente para frases en la hoja
+
+#sonidos
+
+basedir = Path(__file__).resolve().parent
+sounds = basedir / "assets" / "sounds"
+
+# Volúmenes iniciales (variables para después manejar en los slider de menu_opciones)
+volumen_musica = 0.5   # 50%
+volumen_sfx = 0.5      # 50%
